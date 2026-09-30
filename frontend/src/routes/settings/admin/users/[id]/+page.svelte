@@ -14,10 +14,11 @@
 	import type { UserCreate } from '$lib/types/user.type';
 	import { axiosErrorToast } from '$lib/utils/error-util';
 	import { trackUnsavedValue } from '$lib/utils/unsaved-changes-util.svelte';
-	import { KeyRound, LucideChevronLeft } from '@lucide/svelte';
+	import { KeyRound, LucideChevronLeft, LucideLink } from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
 	import { backNavigate } from '../navigate-back-util';
 	import UserForm from '../user-form.svelte';
+	import AdminLinkedAccountList from './admin-linked-account-list.svelte';
 	import AdminPasskeyList from './admin-passkey-list.svelte';
 
 	let { data } = $props();
@@ -26,6 +27,7 @@
 		userGroupIds: data.user.userGroups.map((g) => g.id)
 	});
 	let passkeys: Passkey[] = $state(data.passkeys);
+	let identityProviderLinks = $state(data.identityProviderLinks);
 
 	const userService = new UserService();
 	const customClaimService = new CustomClaimService();
@@ -89,6 +91,7 @@
 			<Tabs.Trigger value="general">{m.general()}</Tabs.Trigger>
 			<Tabs.Trigger value="groups">{m.user_groups()}</Tabs.Trigger>
 			<Tabs.Trigger value="passkeys">{m.passkeys()}</Tabs.Trigger>
+			<Tabs.Trigger value="linked-accounts">{m.linked_accounts()}</Tabs.Trigger>
 			<Tabs.Trigger value="custom-claims">{m.custom_claims()}</Tabs.Trigger>
 		</Tabs.List>
 	</div>
@@ -147,6 +150,27 @@
 			</Item.Root>
 			{#if passkeys.length > 0}
 				<AdminPasskeyList userId={user.id} bind:passkeys />
+			{/if}
+		</Item.Group>
+	</Tabs.Content>
+
+	<Tabs.Content value="linked-accounts">
+		<Item.Group class="bg-card rounded-4xl border p-5 shadow-sm">
+			<Item.Root class="border-none bg-transparent p-0">
+				<Item.Media class="text-primary/80">
+					<LucideLink class="size-5" />
+				</Item.Media>
+				<Item.Content class="min-w-52">
+					<Item.Title class="text-xl font-semibold">{m.linked_accounts()}</Item.Title>
+					<Item.Description
+						>{identityProviderLinks.length > 0
+							? m.admin_linked_accounts_description()
+							: m.user_has_no_linked_accounts()}</Item.Description
+					>
+				</Item.Content>
+			</Item.Root>
+			{#if identityProviderLinks.length > 0}
+				<AdminLinkedAccountList userId={user.id} bind:links={identityProviderLinks} />
 			{/if}
 		</Item.Group>
 	</Tabs.Content>

@@ -36,6 +36,22 @@ func (m *JwtAuthMiddleware) Add(adminRequired bool) gin.HandlerFunc {
 	}
 }
 
+// AddOptional identifies the signed-in user when the request carries a valid session, and otherwise continues without one
+// Unlike the optional mode of AuthMiddleware it never aborts, not even for disabled users, so it suits endpoints that must always answer with a redirect
+func (m *JwtAuthMiddleware) AddOptional() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userID, isAdmin, authenticationMethod, authenticationTime, err := m.Verify(c, false)
+		if err == nil {
+			c.Set("userID", userID)
+			c.Set("userIsAdmin", isAdmin)
+			c.Set("authenticationMethod", authenticationMethod)
+			c.Set("authenticationTime", authenticationTime)
+		}
+
+		c.Next()
+	}
+}
+
 func (m *JwtAuthMiddleware) Verify(c *gin.Context, adminRequired bool) (subject string, isAdmin bool, authenticationMethod string, authenticationTime time.Time, err error) {
 	// Extract the token from the cookie
 	accessToken, err := c.Cookie(cookie.AccessTokenCookieName)

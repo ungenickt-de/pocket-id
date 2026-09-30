@@ -38,6 +38,7 @@
 		{ href: '/settings/admin/user-groups', label: m.user_groups() },
 		{ href: '/settings/admin/oidc-clients', label: m.oidc_clients() },
 		{ href: '/settings/admin/apis', label: m.apis() },
+		{ href: '/settings/admin/identity-providers', label: m.identity_providers() },
 		{ href: '/settings/admin/api-keys', label: m.api_keys() },
 		{
 			href: '/settings/admin/application-configuration',

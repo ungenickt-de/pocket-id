@@ -90,6 +90,69 @@ func TestWithApiKeyAuthDisabled(t *testing.T) {
 	})
 }
 
+func TestJwtAuthOptionalNeverAborts(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	originalEnvConfig := common.EnvConfig
+	defer func() {
+		common.EnvConfig = originalEnvConfig
+	}()
+	common.EnvConfig.AppURL = "https://test.example.com"
+	common.EnvConfig.EncryptionKey = []byte("0123456789abcdef0123456789abcdef")
+
+	db := testutils.NewDatabaseForTest(t)
+
+	instanceID, err := instanceid.Load(t.Context(), db)
+	require.NoError(t, err)
+
+	jwtService, err := service.NewJwtService(t.Context(), db, instanceID)
+	require.NoError(t, err)
+
+	userService := service.NewUserService(db, jwtService, nil, nil, nil, nil, nil, nil)
+	jwtAuth := NewJwtAuthMiddleware(jwtService, userService)
+
+	user := createUserForAuthMiddlewareTest(t, db)
+	jwtToken, err := jwtService.GenerateAccessToken(user, "", time.Hour)
+	require.NoError(t, err)
+
+	router := gin.New()
+	router.Use(NewErrorHandlerMiddleware().Add())
+	router.GET("/api/redirect", jwtAuth.AddOptional(), func(c *gin.Context) {
+		c.String(http.StatusOK, c.GetString("userID"))
+	})
+
+	request := func(t *testing.T, authorization string) *httptest.ResponseRecorder {
+		t.Helper()
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/redirect", nil)
+		if authorization != "" {
+			req.Header.Set("Authorization", authorization)
+		}
+		recorder := httptest.NewRecorder()
+		router.ServeHTTP(recorder, req)
+		return recorder
+	}
+
+	t.Run("sets the user of a valid session", func(t *testing.T) {
+		recorder := request(t, "Bearer "+jwtToken)
+		require.Equal(t, http.StatusOK, recorder.Code)
+		require.Equal(t, user.ID, recorder.Body.String())
+	})
+
+	t.Run("continues without a session", func(t *testing.T) {
+		recorder := request(t, "")
+		require.Equal(t, http.StatusOK, recorder.Code)
+		require.Empty(t, recorder.Body.String())
+	})
+
+	t.Run("continues without the user when it is disabled", func(t *testing.T) {
+		require.NoError(t, db.Model(&model.User{}).Where("id = ?", user.ID).Update("disabled", true).Error)
+
+		recorder := request(t, "Bearer "+jwtToken)
+		require.Equal(t, http.StatusOK, recorder.Code)
+		require.Empty(t, recorder.Body.String())
+	})
+}
+
 func createUserForAuthMiddlewareTest(t *testing.T, db *gorm.DB) model.User {
 	t.Helper()
 

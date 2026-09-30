@@ -20,8 +20,28 @@ const codeMessages: Record<string, () => string> = {
 	webauthn_authentication_failed: () => m.passkey_verification_failed(),
 	passkey_user_verification_required: () => m.passkey_user_verification_required(),
 	synced_passkey_not_allowed: () => m.synced_passkeys_not_allowed(),
-	device_login_expired: () => m.device_login_request_expired()
+	device_login_expired: () => m.device_login_request_expired(),
+	identity_provider_unavailable: () => m.identity_provider_error_unavailable(),
+	identity_provider_unreachable: () => m.identity_provider_error_unreachable(),
+	identity_provider_state_invalid: () => m.identity_provider_error_state_invalid(),
+	identity_provider_login_failed: () => m.identity_provider_error_login_failed(),
+	identity_provider_error: () => m.identity_provider_error_provider_error(),
+	identity_provider_email_required: () => m.identity_provider_error_email_required(),
+	identity_provider_email_in_use: () => m.identity_provider_error_email_in_use(),
+	identity_provider_session_changed: () => m.identity_provider_error_session_changed(),
+	identity_provider_account_not_linked: () => m.identity_provider_error_account_not_linked(),
+	identity_provider_already_linked: () => m.identity_provider_error_already_linked(),
+	identity_provider_user_already_linked: () => m.identity_provider_error_user_already_linked(),
+	user_disabled: () => m.your_account_is_disabled()
 };
+
+/**
+ * Returns the message for an error code the backend passes in the URL after a failed identity provider flow.
+ * Only known codes are translated, so no text from the URL is ever shown.
+ */
+export function getErrorCodeMessage(code: string) {
+	return codeMessages[code]?.() ?? m.an_unknown_error_occurred();
+}
 
 function getApiErrorResponse(e: unknown): ApiErrorResponse | undefined {
 	if (!isAxiosError(e)) {

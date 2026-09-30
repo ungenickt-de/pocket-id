@@ -10,7 +10,10 @@ export const eventTypes: Record<string, string> = {
 	DEVICE_CODE_AUTHORIZATION: m.device_code_authorization(),
 	NEW_DEVICE_CODE_AUTHORIZATION: m.new_device_code_authorization(),
 	PASSKEY_ADDED: m.passkey_added(),
-	PASSKEY_REMOVED: m.passkey_removed()
+	PASSKEY_REMOVED: m.passkey_removed(),
+	IDENTITY_PROVIDER_SIGN_IN: m.identity_provider_sign_in(),
+	IDENTITY_PROVIDER_LINKED: m.identity_provider_linked(),
+	IDENTITY_PROVIDER_UNLINKED: m.identity_provider_unlinked()
 };
 
 /**

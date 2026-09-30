@@ -196,10 +196,11 @@ func registerRoutes(r *gin.Engine, db *gorm.DB, svc *services, rateLimitServices
 
 	optionalBrowserAuth := authMiddleware.WithAdminNotRequired().WithSuccessOptional().WithApiKeyAuthDisabled().Add()
 	browserAuth := authMiddleware.WithAdminNotRequired().WithApiKeyAuthDisabled().Add()
+	// The identity provider callback must always redirect back into the frontend, so it identifies the session without ever aborting the request
 	svc.identityProviderModule.RegisterRoutes(apiGroup,
 		authMiddleware.Add(),
 		browserAuth,
-		optionalBrowserAuth,
+		middleware.NewJwtAuthMiddleware(svc.jwtService, svc.userService).AddOptional(),
 		rateLimitMiddleware.Add(middleware.RateLimitIdentityProviderLogin),
 	)
 	svc.oidcModule.RegisterRoutes(baseGroup, apiGroup, optionalBrowserAuth, browserAuth)

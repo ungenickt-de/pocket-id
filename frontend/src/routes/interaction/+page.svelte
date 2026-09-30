@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
+	import { page } from '$app/state';
 	import FormattedMessage from '$lib/components/formatted-message.svelte';
+	import IdentityProviderButtons from '$lib/components/identity-provider-buttons.svelte';
 	import SignInWrapper from '$lib/components/login-wrapper.svelte';
 	import ScopeList from '$lib/components/scope-list.svelte';
 	import * as Avatar from '$lib/components/ui/avatar';
@@ -203,4 +205,8 @@
 			{m.cancel()}
 		</Button>
 	</div>
+	{#if !$userStore}
+		<!-- Signing in with an identity provider returns to this page, which then continues the authorization -->
+		<IdentityProviderButtons redirect={page.url.pathname + page.url.search} />
+	{/if}
 </SignInWrapper>
