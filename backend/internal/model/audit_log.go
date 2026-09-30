@@ -37,6 +37,9 @@ const (
 	AuditLogEventNewDeviceCodeAuthorization AuditLogEvent = "NEW_DEVICE_CODE_AUTHORIZATION"
 	AuditLogEventPasskeyAdded               AuditLogEvent = "PASSKEY_ADDED"
 	AuditLogEventPasskeyRemoved             AuditLogEvent = "PASSKEY_REMOVED"
+	AuditLogEventIdentityProviderSignIn     AuditLogEvent = "IDENTITY_PROVIDER_SIGN_IN"
+	AuditLogEventIdentityProviderLinked     AuditLogEvent = "IDENTITY_PROVIDER_LINKED"
+	AuditLogEventIdentityProviderUnlinked   AuditLogEvent = "IDENTITY_PROVIDER_UNLINKED"
 )
 
 // Scan and Value methods for GORM to handle the custom type

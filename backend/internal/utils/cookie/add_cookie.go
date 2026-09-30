@@ -28,6 +28,17 @@ func AddReauthenticationTokenCookie(c *gin.Context, reauthenticationToken string
 	addCookie(c, ReauthenticationTokenCookieName, reauthenticationToken, int(3*time.Minute.Seconds()), "/")
 }
 
+// AddIdentityProviderStateCookie stores the encrypted state of a sign-in with an external identity provider
+// The cookie is scoped to the callback path, so it is only sent back when the identity provider redirects the browser to Pocket ID
+func AddIdentityProviderStateCookie(c *gin.Context, maxAgeInSeconds int, path, value string) {
+	addCookie(c, IdentityProviderStateCookieName, value, maxAgeInSeconds, path)
+}
+
+// ClearIdentityProviderStateCookie removes the identity provider state cookie so it cannot be replayed
+func ClearIdentityProviderStateCookie(c *gin.Context, path string) {
+	addCookie(c, IdentityProviderStateCookieName, "", -1, path)
+}
+
 func addCookie(c *gin.Context, name, value string, maxAge int, path string) {
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie(name, value, maxAge, path, "", true, true)

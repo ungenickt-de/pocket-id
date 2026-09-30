@@ -1,6 +1,6 @@
 {
 	"provider": "sqlite",
-	"version": 20260929120000,
+	"version": 20260930120000,
 	"tableOrder": [
 		"users",
 		"user_groups",
@@ -10,7 +10,9 @@
 		"apis",
 		"api_permissions",
 		"oidc_clients_allowed_apis",
-		"oidc_clients_allowed_api_permissions"
+		"oidc_clients_allowed_api_permissions",
+		"identity_providers",
+		"identity_provider_links"
 	],
 	"tables": {
 		"apis": [
