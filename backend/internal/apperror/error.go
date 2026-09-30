@@ -68,6 +68,19 @@ const (
 	CodeLogoTypeNotSupported            Code = "logo_type_not_supported"
 	CodeLogoTooLarge                    Code = "logo_too_large"
 	CodeOidcPARRequired                 Code = "oidc_par_required"
+
+	CodeIdentityProviderUnavailable       Code = "identity_provider_unavailable"
+	CodeIdentityProviderUnreachable       Code = "identity_provider_unreachable"
+	CodeIdentityProviderStateInvalid      Code = "identity_provider_state_invalid"
+	CodeIdentityProviderLoginFailed       Code = "identity_provider_login_failed"
+	CodeIdentityProviderError             Code = "identity_provider_error"
+	CodeIdentityProviderEmailRequired     Code = "identity_provider_email_required"
+	CodeIdentityProviderEmailInUse        Code = "identity_provider_email_in_use"
+	CodeIdentityProviderSessionChanged    Code = "identity_provider_session_changed"
+	CodeIdentityProviderDiscoveryFailed   Code = "identity_provider_discovery_failed"
+	CodeIdentityProviderAccountNotLinked  Code = "identity_provider_account_not_linked"
+	CodeIdentityProviderAlreadyLinked     Code = "identity_provider_already_linked"
+	CodeIdentityProviderUserAlreadyLinked Code = "identity_provider_user_already_linked"
 )
 
 // FieldError describes one safe, client-actionable validation failure

@@ -291,3 +291,55 @@ func OidcPARRequired() *Error {
 func InvalidEmailVerificationToken() *Error {
 	return New(CodeEmailVerificationTokenInvalid, http.StatusBadRequest, "Email verification token is invalid")
 }
+
+func IdentityProviderUnavailable() *Error {
+	return New(CodeIdentityProviderUnavailable, http.StatusNotFound, "The identity provider is not available")
+}
+
+func IdentityProviderUnreachable(cause error) *Error {
+	return Wrap(cause, CodeIdentityProviderUnreachable, http.StatusBadGateway, "The identity provider could not be reached")
+}
+
+func IdentityProviderStateInvalid(cause error) *Error {
+	return Wrap(cause, CodeIdentityProviderStateInvalid, http.StatusBadRequest, "The sign-in request is invalid or has expired, please try again")
+}
+
+func IdentityProviderLoginFailed(cause error) *Error {
+	return Wrap(cause, CodeIdentityProviderLoginFailed, http.StatusBadGateway, "The response of the identity provider could not be verified")
+}
+
+func IdentityProviderReturnedError(errorCode string) *Error {
+	return New(CodeIdentityProviderError, http.StatusBadRequest, "The identity provider returned an error").WithDetail("error", errorCode)
+}
+
+func IdentityProviderEmailRequired() *Error {
+	return New(CodeIdentityProviderEmailRequired, http.StatusBadRequest, "The identity provider did not provide an email address, which is required to create an account")
+}
+
+func IdentityProviderEmailInUse() *Error {
+	return New(CodeIdentityProviderEmailInUse, http.StatusConflict, "An account with the email address of the external account already exists, sign in to it and link the external account in the account settings")
+}
+
+func IdentityProviderSessionChanged() *Error {
+	return New(CodeIdentityProviderSessionChanged, http.StatusUnauthorized, "The session changed while linking the external account, please sign in and try again")
+}
+
+func IdentityProviderDiscoveryFailed(cause error) *Error {
+	return Wrap(cause, CodeIdentityProviderDiscoveryFailed, http.StatusBadRequest, "The OpenID Connect discovery document of the issuer could not be loaded").WithFields([]FieldError{{
+		Field:   "issuer",
+		Code:    "invalid_value",
+		Message: "must point to an OpenID Connect provider with a discovery document",
+	}})
+}
+
+func IdentityProviderAccountNotLinked() *Error {
+	return New(CodeIdentityProviderAccountNotLinked, http.StatusForbidden, "No account is linked to this external account, sign in with a passkey first and link it in the account settings")
+}
+
+func IdentityProviderExternalAccountAlreadyLinked() *Error {
+	return New(CodeIdentityProviderAlreadyLinked, http.StatusConflict, "This external account is already linked to another user")
+}
+
+func IdentityProviderUserAlreadyLinked() *Error {
+	return New(CodeIdentityProviderUserAlreadyLinked, http.StatusConflict, "The account is already linked to a different account at this identity provider")
+}

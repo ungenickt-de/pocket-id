@@ -17,6 +17,7 @@ import (
 	"github.com/pocket-id/pocket-id/backend/internal/emailverification"
 	"github.com/pocket-id/pocket-id/backend/internal/environment"
 	"github.com/pocket-id/pocket-id/backend/internal/geolite"
+	"github.com/pocket-id/pocket-id/backend/internal/identityprovider"
 	"github.com/pocket-id/pocket-id/backend/internal/ldapsync"
 	"github.com/pocket-id/pocket-id/backend/internal/oidc"
 	"github.com/pocket-id/pocket-id/backend/internal/onetimeaccess"
@@ -51,6 +52,7 @@ type services struct {
 	userSignUpModule        *usersignup.Module
 	oneTimeAccessModule     *onetimeaccess.Module
 	emailVerificationModule *emailverification.Module
+	identityProviderModule  *identityprovider.Module
 	apiModule               *api.Module
 	environmentModule       *environment.Module
 	actors                  francishost.Host
@@ -253,6 +255,21 @@ func initServices(
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create email verification module: %w", err)
+	}
+
+	svc.identityProviderModule, err = identityprovider.New(identityprovider.Dependencies{
+		DB:            db,
+		HTTPClient:    httpClient,
+		AppURL:        common.EnvConfig.AppURL,
+		EncryptionKey: common.EnvConfig.EncryptionKey,
+		Signer:        svc.jwtService,
+		AuditLog:      svc.auditLogService,
+		UserCreator:   svc.userService,
+		AppConfig:     svc.appConfigService,
+		ScimSync:      svc.scimSyncModule,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create identity provider module: %w", err)
 	}
 
 	svc.environmentModule = environment.New(environment.Dependencies{

@@ -16,6 +16,7 @@
 	import { startRegistration } from '@simplewebauthn/browser';
 	import { toast } from 'svelte-sonner';
 	import AccountForm from './account-form.svelte';
+	import LinkedAccounts from './linked-accounts.svelte';
 	import LocalePicker from './locale-picker.svelte';
 	import PasskeyList from './passkey-list.svelte';
 	import RenamePasskeyModal from './rename-passkey-modal.svelte';
@@ -23,6 +24,7 @@
 	let { data } = $props();
 	let account = $state(data.account);
 	let passkeys = $state(data.passkeys);
+	let identityProviderLinks = $state(data.identityProviderLinks);
 	let passkeyToRename: Passkey | null = $state(null);
 	const userService = new UserService();
 	const webauthnService = new WebAuthnService();
@@ -121,6 +123,8 @@
 		<PasskeyList bind:passkeys />
 	{/if}
 </Item.Group>
+
+<LinkedAccounts providers={data.identityProviders} bind:links={identityProviderLinks} />
 
 <Item.Root variant="card" class="border-border mb-2">
 	<Item.Media class="text-primary/80">

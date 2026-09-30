@@ -75,7 +75,13 @@ func (s *AuditLogService) Create(ctx context.Context, event model.AuditLogEvent,
 // CreateNewSignInWithEmail creates a new audit log entry in the database and sends an email if the device hasn't been used before
 // emailLoginNotificationEnabled gates whether the notification email is sent, so the caller decides using the config it already loaded
 func (s *AuditLogService) CreateNewSignInWithEmail(ctx context.Context, ipAddress, userAgent, userID string, tx *gorm.DB, emailLoginNotificationEnabled bool) model.AuditLog {
-	createdAuditLog, ok := s.Create(ctx, model.AuditLogEventSignIn, ipAddress, userAgent, userID, model.AuditLogData{}, tx)
+	return s.CreateSignInEventWithEmail(ctx, model.AuditLogEventSignIn, model.AuditLogData{}, ipAddress, userAgent, userID, tx, emailLoginNotificationEnabled)
+}
+
+// CreateSignInEventWithEmail records a sign-in with the given event and data, and sends an email if the device hasn't been used before
+// It lets sign-in methods other than passkeys record their own event type while keeping the new device notification
+func (s *AuditLogService) CreateSignInEventWithEmail(ctx context.Context, event model.AuditLogEvent, data model.AuditLogData, ipAddress, userAgent, userID string, tx *gorm.DB, emailLoginNotificationEnabled bool) model.AuditLog {
+	createdAuditLog, ok := s.Create(ctx, event, ipAddress, userAgent, userID, data, tx)
 	if !ok {
 		// At this point the transaction has been canceled already, and error has been logged
 		return createdAuditLog

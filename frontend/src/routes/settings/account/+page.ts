@@ -1,3 +1,4 @@
+import IdentityProviderService from '$lib/services/identity-provider-service';
 import UserService from '$lib/services/user-service';
 import WebAuthnService from '$lib/services/webauthn-service';
 import type { PageLoad } from './$types';
@@ -5,14 +6,19 @@ import type { PageLoad } from './$types';
 export const load: PageLoad = async () => {
 	const webauthnService = new WebAuthnService();
 	const userService = new UserService();
+	const identityProviderService = new IdentityProviderService();
 
-	const [account, passkeys] = await Promise.all([
+	const [account, passkeys, identityProviders, identityProviderLinks] = await Promise.all([
 		userService.getCurrent(),
-		webauthnService.listCredentials()
+		webauthnService.listCredentials(),
+		identityProviderService.listPublic(),
+		identityProviderService.listOwnLinks()
 	]);
 
 	return {
 		account,
-		passkeys
+		passkeys,
+		identityProviders,
+		identityProviderLinks
 	};
 };
